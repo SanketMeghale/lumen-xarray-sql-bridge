@@ -6,43 +6,78 @@ Prototype repository for exposing `xarray.Dataset` objects through Lumen's exist
 
 ![Architecture](assets/architecture.svg)
 
-## Proposal Summary
+## One-line proposal
 
-Lumen's AI workflow already knows how to reason about `BaseSQLSource` implementations. Scientific data, however, often arrives as `xarray.Dataset` instead of a database table. This prototype follows the maintainer direction of building on `BaseSQLSource` and [`xarray-sql`](https://github.com/alxmrs/xarray-sql) so AI can write transforms through the existing SQL path instead of relying on a separate xarray-specific transform system.
+Adapt xarray-backed scientific data into Lumen's `BaseSQLSource` contract using [`xarray-sql`](https://github.com/alxmrs/xarray-sql), so the existing `SQLAgent` can write and execute transforms without introducing a second AI transform system.
 
-The core adapter is `XarraySQLSource`, a `BaseSQLSource` implementation backed by `xarray-sql` and DataFusion.
+## Why this repository exists
 
-## Why this stands out
+Lumen AI already has a strong path for SQL-capable sources:
 
-- Reuses Lumen's existing SQL agent instead of introducing a parallel AI transform system
-- Exposes each xarray `data_var` as its own SQL table, which preserves mixed-dimensional datasets
-- Supports schema discovery, SQL execution, and derived SQL-backed tables
-- Demonstrates a practical bridge between tabular AI workflows and scientific array data
+- inspect schema
+- generate SQL
+- validate SQL
+- create derived SQL-backed tables
 
-## Key design decision
+Scientific datasets often live in `xarray.Dataset`, which is not directly shaped like a SQL source. The point of this prototype is to prove that xarray data can be lifted into the same AI workflow by implementing a thin `BaseSQLSource` adapter instead of building separate xarray-specific agent logic.
 
-The prototype registers one SQL table per xarray variable.
+## Maintainer FAQ
 
-That decision matters because real datasets often mix variables with different dimensions. Flattening the whole dataset into a single SQL shape would either fail or distort the data model. Per-variable registration stays compatible with `xarray-sql` while matching Lumen's existing logical table abstraction.
+| Question | Short answer |
+| --- | --- |
+| Why `BaseSQLSource`? | Because Lumen's existing AI transform flow already depends on that contract. |
+| Why `xarray-sql`? | Because it gives the prototype a real SQL execution layer over xarray-backed data. |
+| How does AI write transforms? | Through the existing `SQLAgent` path once the source exposes SQL tables, schema, and `execute(...)`. |
+| Why one table per `data_var`? | Mixed-dimension xarray datasets break down if forced into one uniform table shape. |
+| Why not keep this in `XarraySource` only? | `XarraySource` is useful for xarray-native access, but it does not satisfy the SQL AI contract on its own. |
+| What is the prototype proving? | That xarray-backed data can participate in Lumen's SQL AI path with minimal AI-specific changes. |
+| What does it not prove? | It does not prove that every natural-language prompt or every backend-specific SQL feature will work. |
 
-## What works
+More detail: [docs/maintainer_faq.md](docs/maintainer_faq.md)
+
+## Design in one screen
+
+1. Wrap an `xarray.Dataset` in `XarraySQLSource`.
+2. Register each base xarray variable as its own SQL table through `xarray-sql`.
+3. Reuse Lumen's `BaseSQLSource` API for schema, execution, and derived SQL tables.
+4. Let Lumen's existing `SQLAgent` generate transforms against those tables.
+
+This is the critical design choice:
+
+- one SQL table per xarray variable
+
+That keeps mixed-dimensional datasets queryable and matches Lumen's logical table model. It also avoids flattening unrelated variables into a single lossy table representation.
+
+## Why this architecture is the right direction
+
+- Reuses existing Lumen AI infrastructure instead of adding another agent path
+- Makes the prototype legible to maintainers because it follows established source abstractions
+- Preserves a clear separation of concerns
+  - xarray remains the data model
+  - `xarray-sql` handles execution
+  - Lumen AI stays responsible for prompt-to-SQL behavior
+- Reduces the amount of AI-specific code needed for scientific data workflows
+
+## What works today
 
 - `SELECT * ... LIMIT 5` style previews
 - filtering on dimension coordinates such as `time`, `lat`, and `lon`
 - grouping, sorting, aggregates, and derived queries
 - SQL-backed derived tables via `create_sql_expr_source(...)`
 - AI compatibility with Lumen's `SQLAgent` path
+- mixed-dimension variables by registering each `data_var` independently
 
-## What this does not claim
+## Known constraints
 
 - not every natural-language prompt will work
-- not every backend SQL feature is guaranteed to match DuckDB exactly
+- not every DataFusion or `xarray-sql` edge case matches DuckDB exactly
 - not every xarray-native scientific transform belongs naturally in SQL
-- not all auxiliary or non-dimension coordinates are modeled as first-class SQL columns
+- auxiliary or non-dimension coordinates are not yet modeled as general SQL columns
+- this repository is a prototype proving feasibility, not a production-ready upstream package
 
-## Quick proof
+## Concrete example
 
-Local demo query:
+Local demo output:
 
 ```text
 Tables: ['temperature']
@@ -54,9 +89,47 @@ Top 5 rows
 2 2024-01-01  20.0  70.0          3.0
 3 2024-01-01  20.0  80.0          4.0
 4 2024-02-01  10.0  70.0          5.0
+
+Average temperature by latitude
+    lat  avg_temperature
+0  10.0              5.5
+1  20.0              7.5
 ```
 
-This repository is meant to demonstrate architectural feasibility, not production completeness.
+Prompt shape this architecture targets:
+
+```text
+Calculate the average temperature by latitude and sort by latitude.
+```
+
+Representative SQL produced or supported by the prototype:
+
+```sql
+SELECT "lat", AVG("temperature") AS avg_temperature
+FROM "temperature"
+GROUP BY "lat"
+ORDER BY "lat"
+```
+
+## Validation
+
+What is already verified in this repository:
+
+- focused source tests pass
+- the standalone demo runs locally
+- the source behaves like a SQL-capable source for Lumen's AI path
+- GitHub Actions runs the focused test suite
+
+The proof tests live in [tests/test_source.py](tests/test_source.py).
+
+## Repository layout
+
+- `src/lumen_xarray_sql_prototype/source.py`: prototype `XarraySQLSource`
+- `scripts/demo.py`: local non-LLM proof script
+- `scripts/live_sql_agent_demo.py`: live SQL-agent demo once credentials are available
+- `tests/test_source.py`: focused source and AI-path proof tests
+- `docs/maintainer_faq.md`: review-oriented design answers
+- `PR_NOTES.md`: PR rationale and notes that should not live in docstrings
 
 ## Install
 
@@ -87,23 +160,11 @@ set OPENAI_API_KEY=...
 python scripts/live_sql_agent_demo.py
 ```
 
-## Repository layout
+## If this moves toward upstream
 
-- `src/lumen_xarray_sql_prototype/source.py`: prototype `XarraySQLSource`
-- `scripts/demo.py`: local query demo without an LLM
-- `scripts/live_sql_agent_demo.py`: live SQL-agent demo once credentials are available
-- `tests/test_source.py`: focused source and AI-path proof tests
-- `PR_NOTES.md`: proposal and PR rationale kept out of code docstrings
+The next hardening steps are straightforward:
 
-## Current status
-
-- standalone prototype package
-- local demo passes
-- focused tests pass
-- GitHub Actions test workflow included
-
-## Next hardening steps
-
-- validate against live model output under a configured provider
-- broaden prompt coverage for more complex scientific prompts
-- add more explicit handling for auxiliary coordinates and backend dialect edge cases
+- validate prompt quality with a live configured model
+- expand coverage for backend dialect edge cases
+- improve modeling of auxiliary coordinates
+- decide how this should coexist with the existing `XarraySource` and `XarrayAgent`
