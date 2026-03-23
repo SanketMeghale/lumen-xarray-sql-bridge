@@ -35,6 +35,12 @@ Scientific datasets often live in `xarray.Dataset`, which is not directly shaped
 
 More detail: [docs/maintainer_faq.md](docs/maintainer_faq.md)
 
+Proposal package:
+
+- [docs/proposal_brief.md](docs/proposal_brief.md)
+- [docs/demo_script.md](docs/demo_script.md)
+- [docs/evaluation_matrix.md](docs/evaluation_matrix.md)
+
 ## Design in one screen
 
 1. Wrap an `xarray.Dataset` in `XarraySQLSource`.
@@ -129,6 +135,9 @@ The proof tests live in [tests/test_source.py](tests/test_source.py).
 - `scripts/live_sql_agent_demo.py`: live SQL-agent demo once credentials are available
 - `tests/test_source.py`: focused source and AI-path proof tests
 - `docs/maintainer_faq.md`: review-oriented design answers
+- `docs/proposal_brief.md`: compact proposal framing
+- `docs/demo_script.md`: short standout demo narrative
+- `docs/evaluation_matrix.md`: reviewer-facing evidence summary
 - `PR_NOTES.md`: PR rationale and notes that should not live in docstrings
 
 ## Install
