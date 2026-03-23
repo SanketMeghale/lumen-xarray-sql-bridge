@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lumen-xarray-sql-prototype"
+version = "0.1.0"
+description = "Prototype BaseSQLSource adapter that exposes xarray datasets through Lumen's SQL AI path."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "lumen",
+  "xarray",
+  "xarray-sql",
+  "pandas",
+  "param",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest",
+  "pytest-asyncio",
+  "openai",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

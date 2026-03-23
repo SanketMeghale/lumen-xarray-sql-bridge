@@ -1,0 +1,10 @@
+lumen
+xarray
+xarray-sql
+pandas
+param
+
+[test]
+pytest
+pytest-asyncio
+openai
