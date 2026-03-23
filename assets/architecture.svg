@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420" role="img" aria-labelledby="title desc">
+  <title id="title">Lumen xarray SQL bridge prototype architecture</title>
+  <desc id="desc">A prototype that exposes xarray datasets through a SQL adapter so Lumen's SQL agent can query them.</desc>
+  <rect width="960" height="420" fill="#f6f4ef"/>
+  <rect x="40" y="70" width="180" height="110" rx="18" fill="#274c77"/>
+  <text x="130" y="112" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#ffffff">xarray</text>
+  <text x="130" y="144" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#d7e3f4">Dataset</text>
+  <text x="130" y="168" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#d7e3f4">data_vars + coords</text>
+
+  <rect x="300" y="50" width="220" height="150" rx="22" fill="#6096ba"/>
+  <text x="410" y="92" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#ffffff">XarraySQLSource</text>
+  <text x="410" y="126" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#f8fbff">BaseSQLSource adapter</text>
+  <text x="410" y="152" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#f8fbff">one SQL table per variable</text>
+  <text x="410" y="178" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#f8fbff">schema + derived tables</text>
+
+  <rect x="600" y="70" width="180" height="110" rx="18" fill="#a3cef1"/>
+  <text x="690" y="112" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#1d3557">xarray-sql</text>
+  <text x="690" y="144" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#1d3557">DataFusion</text>
+  <text x="690" y="168" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#1d3557">SQL execution</text>
+
+  <rect x="620" y="250" width="260" height="120" rx="20" fill="#faedcd"/>
+  <text x="750" y="292" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#7f5539">Lumen SQLAgent</text>
+  <text x="750" y="324" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#7f5539">prompt → SQL → pipeline</text>
+  <text x="750" y="350" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#7f5539">existing AI path reused</text>
+
+  <rect x="40" y="250" width="220" height="120" rx="20" fill="#e9edc9"/>
+  <text x="150" y="292" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="28" fill="#3a5a40">What this proves</text>
+  <text x="150" y="322" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#3a5a40">scientific arrays can use</text>
+  <text x="150" y="348" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" fill="#3a5a40">Lumen's SQL AI workflow</text>
+
+  <path d="M220 125 L300 125" stroke="#1d3557" stroke-width="5" fill="none"/>
+  <polygon points="300,125 286,117 286,133" fill="#1d3557"/>
+
+  <path d="M520 125 L600 125" stroke="#1d3557" stroke-width="5" fill="none"/>
+  <polygon points="600,125 586,117 586,133" fill="#1d3557"/>
+
+  <path d="M690 180 L690 235" stroke="#7f5539" stroke-width="5" fill="none"/>
+  <polygon points="690,250 682,236 698,236" fill="#7f5539"/>
+
+  <path d="M260 310 C370 310, 460 310, 620 310" stroke="#588157" stroke-width="5" fill="none"/>
+  <polygon points="620,310 606,302 606,318" fill="#588157"/>
+</svg>
