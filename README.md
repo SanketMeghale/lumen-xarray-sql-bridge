@@ -8,7 +8,7 @@ Prototype repository for exposing `xarray.Dataset` objects through Lumen's exist
 
 ## Proposal Summary
 
-Lumen's AI workflow already knows how to reason about `BaseSQLSource` implementations. Scientific data, however, often arrives as `xarray.Dataset` instead of a database table. This prototype shows that xarray-backed datasets can be lifted into the same SQL agent workflow through a thin compatibility layer instead of building a second xarray-specific AI stack.
+Lumen's AI workflow already knows how to reason about `BaseSQLSource` implementations. Scientific data, however, often arrives as `xarray.Dataset` instead of a database table. This prototype follows the maintainer direction of building on `BaseSQLSource` and [`xarray-sql`](https://github.com/alxmrs/xarray-sql) so AI can write transforms through the existing SQL path instead of relying on a separate xarray-specific transform system.
 
 The core adapter is `XarraySQLSource`, a `BaseSQLSource` implementation backed by `xarray-sql` and DataFusion.
 
@@ -93,6 +93,7 @@ python scripts/live_sql_agent_demo.py
 - `scripts/demo.py`: local query demo without an LLM
 - `scripts/live_sql_agent_demo.py`: live SQL-agent demo once credentials are available
 - `tests/test_source.py`: focused source and AI-path proof tests
+- `PR_NOTES.md`: proposal and PR rationale kept out of code docstrings
 
 ## Current status
 

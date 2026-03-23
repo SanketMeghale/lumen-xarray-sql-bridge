@@ -31,11 +31,10 @@ if TYPE_CHECKING:
 
 class XarraySQLSource(BaseSQLSource):
     """
-    SQL-backed xarray source powered by `xarray-sql`.
+    Exposes xarray-backed data through the BaseSQLSource interface.
 
-    Each data variable is registered as an independent SQL table so datasets
-    with heterogeneous dimensionality remain queryable through Lumen's SQL AI
-    path.
+    Base xarray variables are registered as SQL tables via `xarray-sql`,
+    allowing Lumen's SQL tooling to execute queries against the dataset.
     """
 
     dataset = param.Parameter(doc="""
